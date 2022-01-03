@@ -1,9 +1,9 @@
 package com.projetoFinalModulo1.navalBattle.auxClass;
 
-public class Player {
-    private String type;
-    private Board board;
-    private String name;
+abstract public class  Player {
+//    protected String type;
+    public Board board = new Board();
+    protected String name;
     private int score;
 
     public String getName() {
