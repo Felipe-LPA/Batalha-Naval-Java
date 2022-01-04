@@ -26,7 +26,7 @@ public static void start(){
     boolean invalidOptSetShips = true;
     boolean setShipsAuto = true;
     while(invalidOptSetShips){
-        System.out.print("Escolha uma das opções para espalhar seus navios pelo tabuleiro(1) para automático ou (2) manual: ");
+        System.out.print("Escolha uma das opções para espalhar seus navios pelo tabuleiro (1) para automático ou (2) manual: ");
         int opt = Integer.parseInt(sc.nextLine());
         if(opt == 1 || opt == 2){
             invalidOptSetShips = false;
