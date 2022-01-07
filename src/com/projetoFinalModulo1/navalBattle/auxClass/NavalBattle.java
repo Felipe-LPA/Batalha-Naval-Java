@@ -4,8 +4,8 @@ public class NavalBattle extends Player{
     Bot bot;
     Human human;
 
-    public void printWinner(){
-
+    public void printWinner(String winnerName){
+//        System.out.printf("| %s | %s |%n" ,);
     }
     public void start(){
 
