@@ -56,18 +56,29 @@ public class Board {
 //    public boolean verifyWinner() {
 //        return false;
 //    }
-public void setEmptyPositions(){
-    for (String[] position : POSITIONS) {
-        Arrays.fill(position, " ");
+    public void setEmptyPositions(){
+        for (String[] position : POSITIONS) {
+            Arrays.fill(position, " ");
+        }
     }
-}
 
     private String getLetter(int index){
         return Math.abs(index) < 10 ? this.LETTERS.substring(index, index + 1) : " ";
     }
 
-    private int getNumber(String index){
+    public int getNumber(String index){
         return index.contains(index.toUpperCase()) ? this.LETTERS.indexOf(index.toUpperCase()) : 99;
+    }
+
+    public int  thereIsShip(int column, int row) {
+        return this.POSITIONS[row][column] == "N" ? 1:2;
+    }
+
+    public void shot(int column, int row, int match){
+       if (this.POSITIONS [row][column] == " " && match == 1) this.updatePositions(column, row, "n");
+        else if (this.POSITIONS [row][column] == " " && match ==2) this.updatePositions(column, row, "-");
+        if (this.POSITIONS [row][column] == "N" && match == 1) this.updatePositions(column, row, "X");
+         else if (this.POSITIONS [row][column] == "N" && match == 2) this.updatePositions(column, row, "*");
     }
 
 }
