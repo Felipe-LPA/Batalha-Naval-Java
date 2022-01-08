@@ -2,99 +2,109 @@ package com.projetoFinalModulo1.navalBattle;
 
 import com.projetoFinalModulo1.navalBattle.auxClass.Bot;
 import com.projetoFinalModulo1.navalBattle.auxClass.Human;
-import com.projetoFinalModulo1.navalBattle.auxClass.Player;
 
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.function.Consumer;
 
 public class NavalBattle {
 
     public static void start(){
-        String name = "";
         boolean plGame = true;
         while (plGame) {
-            name = playGame(name);
+            playGame();
             plGame = !(askBinaryQuestion("Fim de Jogo!", "Jogar de Novo", "Parar") == 2);
         }
         System.out.println("Obrigado por jogar conosco!!!");
     }
 
-    public static String playGame(String name){
+    public static void playGame(){
 
         Bot bot = initiateBot();
-        bot = setBotBoard(bot);
+        setBotBoard(bot);
 
-        Human human = initiateHuman(name);
-        human = setHumanBoard(human);
-        name = human.getName();
+        Human human = initiateHuman();
+        setHumanBoard(human);
 
         int firstPlayer = chooseWhoStarts();
         printWhoStarts(firstPlayer == 1 ? "Você" : bot.getName());
 
         boolean followPlaying = true;
         int iteration = 0;
+        String turn;
         while(followPlaying) {
-            if (iteration % 2 == 0) {
-                if (firstPlayer == 1) turnHuman(bot, human);
-                else turnBot(bot, human);
+            if ((iteration % 2 == 0 && firstPlayer != 1) || (iteration % 2 != 0 && firstPlayer == 1)) {
+                turnHuman(bot, human);
+//                turn = human.getName();
             } else {
-                if (firstPlayer == 1) turnBot(bot, human);
-                else turnHuman(bot, human);
+                turnBot(bot, human);
+//                turn = bot.getName();
             }
             iteration++;
-            followPlaying = verifyWinner();
+            followPlaying = verifyWinner(bot.getScore(), human.getScore());
         }
         System.out.println("Hora de ver o resultado desta partida!");
         System.out.printf("Tabuleiro de %s:%n", human.getName());
         human.board.printPosition();
         System.out.printf("Tabuleiro de %s:%n", bot.getName());
         bot.board.printPosition();
-        return name;
     }
 
-    private static boolean verifyWinner() {
+    private static boolean verifyWinner(int botScore, int humanScore) {
         // This method needs to be developed
-        return launchCoin() == 1;
+        return !(botScore == 10 || humanScore == 10);
     }
-    private static Human turnBot(Bot bot, Human human) {
+    private static void turnBot(Bot bot, Human human) {
+//        bot.board.printPosition();
         Random random = new Random();
         int column = random.nextInt(10);
         int row = random.nextInt(10);
-
-        //verify is position is valid! ??
-        int match = bot.doTurn(column, row);
-        char ck = human.board.shot(column, row, match);
-        check(ck, bot, column, row);
-
-        human.board.printPosition();
-        return human;
+        boolean validShot = false;
+        while(!validShot){
+            column = random.nextInt(10);
+            row = random.nextInt(10);
+            validShot = bot.board.isShotValid(row, column);
+        }
+        boolean hit = human.board.checkHit(row, column);
+        if(hit) bot.setScore();
+        bot.board.setSelfMark(row, column, hit);
+        human.board.setOpponentMark(row, column);
     }
-    private static Bot turnHuman(Bot bot, Human human) {
+    private static void turnHuman(Bot bot, Human human) {
         Scanner sc = new Scanner(System.in);
         Random random = new Random();
-        int row;
-        int column;
+        int row = random.nextInt(10);
+        int column = random.nextInt(10);
+        boolean validShot = false;
+        while (!validShot){
+            human.board.printPosition();
+            System.out.printf("Score: Você %d : %d %s%n", human.getScore(), bot.getScore(), bot.getName());
+            System.out.printf("Sua vez de jogar: %nInforme uma posição para atirar em seu adversário(Ex: A2, b4, c7...)%n Digite r para random%nopç: \"");
+            String position = sc.nextLine();
+            if(!Objects.equals(position, "r") && !Objects.equals(position, "R")){
+                String[] splitedPosition = position.split("");
+                String aux = splitedPosition[0].toUpperCase();
+                row = human.checkNumber(aux);
+                try {
+                    column =  Integer.parseInt(splitedPosition[1]);
+                    validShot = human.board.isShotValid(row, column);
+                }catch (NumberFormatException exception){
+                    
+                }
+            }else{
+                row = random.nextInt(10);
+                column = random.nextInt(10);
+                validShot = human.board.isShotValid(row, column);
+            }
+            if(!validShot){
+                System.out.printf("A posição %s é inválida, jogue novamente!", position);
+            }
 
-        System.out.printf("Sua vez de jogar: %nInforme uma posição para atirar em seu adversário(Ex: A2, b4, c7...)%n Digite r para random%nopç: \"");
-        String position = sc.nextLine();
-        if(!Objects.equals(position, "r") && !Objects.equals(position, "R")){
-           String[] splitedPosition = position.split("");
-           String aux =splitedPosition[0].toUpperCase();
-           row = human.checkNumber(aux);
-           column =  Integer.parseInt(splitedPosition[1]);
-        }else{
-            row = random.nextInt(10);
-            column = random.nextInt(10);
         }
-
-        int match = human.doTurn(column, row);
-        char ck = bot.board.shot(column, row, match);
-        check(ck, human, column, row);
-
-        return bot;
+        boolean hit = bot.board.checkHit(row, column);
+        if(hit) human.setScore();
+        human.board.setSelfMark(row, column, hit);
+        bot.board.setOpponentMark(row, column);
     }
 
     private static Bot initiateBot(){
@@ -102,28 +112,24 @@ public class NavalBattle {
         bot.setName();
         return bot;
     }
-    private static Bot setBotBoard(Bot bot) {
+    private static void setBotBoard(Bot bot) {
         bot.board.setEmptyPositions();
         bot.board.setShips(true);
 
-        return bot;
     }
-    private static Human initiateHuman(String name){
+    private static Human initiateHuman(){
         Scanner sc = new Scanner(System.in);
         Human human = new Human();
-        if (name == "") {
-            System.out.print("Digite seu nome: ");
-            name = sc.nextLine();
-        }
+        System.out.print("Digite seu nome: ");
+        String name = sc.nextLine();
         human.setName(name);
         return human;
     }
-    private static Human setHumanBoard(Human human) {
+    private static void setHumanBoard(Human human) {
         boolean setShipsAuto = !(askBinaryQuestion("É hora de escolher a posição dos navios!", "automático", "manual") == 2);
         human.board.setEmptyPositions();
         human.board.setShips(setShipsAuto);
         human.board.printPosition();
-        return human;
     }
     private static int askBinaryQuestion(String msg, String opt1, String opt2) {
         Scanner sc = new Scanner(System.in);
@@ -156,12 +162,5 @@ public class NavalBattle {
         System.out.printf("%s começa o Jogo!%n", winner);
     }
 
-    //Caso player atire em sua própria posição!
-    private static  void  check(char check, Player pl, int column, int row){
-        if (check == 'n'){
-            pl.board.updatePositions(column, row,"n");
-        }else if(check == 'X'){
-            pl.board.updatePositions(column, row,"X");
-        }
-    }
+
 }

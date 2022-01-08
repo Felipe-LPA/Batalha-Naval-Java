@@ -4,14 +4,10 @@ import java.util.*;
 
 public class Board {
     private final String[][] POSITIONS = new String[10][10];
-    private int ships = 10;
     private final String LETTERS = "ABCDEFGHIJ";
 
-//    public void updatePositions(int column, char rowLetter, String mark) {
-//        int row = this.getNumber(rowLetter);
-//            this.POSITIONS[row][column] = mark;
-//    }
-    public void updatePositions(int column, int row, String mark) {
+
+    public void updatePositions(int row, int column, String mark) {
         this.POSITIONS[row][column] = mark;
     }
     public void printPosition() {
@@ -21,16 +17,15 @@ public class Board {
         }
     }
 
-    public boolean isValidPosition(int column, int row) {
+    public boolean isValidPosition(int row, int column) {
         return Objects.equals(this.POSITIONS[row][column], " ");
     }
 
-    //    fazer a inclusão dos navios com o metodo updatePositions
+
     public void setShips(boolean isAuto) {
         int i = 0;
-//        int column;
-//        int row;
-        while (i < this.ships) {
+        int ships = 10;
+        while (i < ships) {
                 Random random = new Random();
                 int column = random.nextInt(10);
                 int row = random.nextInt(10);
@@ -46,45 +41,67 @@ public class Board {
                 }
             }
 //            System.out.printf("row: %d, column: %d  - %s%n", row, column, this.isValidPosition(column, row));
-            if (row != 99 && this.isValidPosition( column, row)) {
-                this.updatePositions(column, row, "N");
+            if (row != 99 && this.isValidPosition(row, column)) {
+                this.updatePositions(row, column, "N");
                 i++;
             }
         }
     }
-//    Movido para NavalBattle
-//    public boolean verifyWinner() {
-//        return false;
-//    }
+
     public void setEmptyPositions(){
         for (String[] position : POSITIONS) {
             Arrays.fill(position, " ");
         }
     }
 
-    private String getLetter(int index){
+    public String getLetter(int index){
         return Math.abs(index) < 10 ? this.LETTERS.substring(index, index + 1) : " ";
     }
 
     public int getNumber(String index){
-        return index.contains(index.toUpperCase())? this.LETTERS.indexOf(index.toUpperCase()) : 99;
+        return this.LETTERS.contains(index.toUpperCase())? this.LETTERS.indexOf(index.toUpperCase()) : 99;
     }
 
-    public int  thereIsShip(int column, int row) {
-        return this.POSITIONS[row][column] == "N" ? 1 : 2;
+    public boolean isShotValid(int row, int column) {
+        return Objects.equals(this.POSITIONS[row][column], " ") ||
+                Objects.equals(this.POSITIONS[row][column], "N");
+    }
+    public boolean checkHit(int row, int column){
+        String mark = this.POSITIONS[row][column];
+        return Objects.equals(mark, "N") || Objects.equals(mark, "X") || Objects.equals(mark, "n");
     }
 
-    public char shot(int column, int row, int match){
-       if (this.POSITIONS [row][column] == " " && match == 1) {
-           this.updatePositions(column, row, "-");
-           return 'n';
-       }else if (this.POSITIONS [row][column] == " " && match ==2) this.updatePositions(column, row, "-");
-        if (this.POSITIONS [row][column] == "N" && match == 1) {
-            this.updatePositions(column, row, "*");
-            return  'X';
-        }else if (this.POSITIONS [row][column] == "N" && match == 2) this.updatePositions(column, row, "*");
-        return 'a';
+    public void setSelfMark(int row, int column, boolean hit) {
+        String previousMark = this.POSITIONS[row][column];
+        if(hit) {
+            if (Objects.equals(previousMark, " ")) {
+                this.updatePositions(row, column, "*");
+            } else if (Objects.equals(previousMark, "N")) {
+                this.updatePositions(row, column, "X");
+            }
+        }
+        else{
+            if (Objects.equals(previousMark, " ")){
+                this.updatePositions(row, column, "-");
+            }
+            else if (Objects.equals(previousMark, "N")){
+                this.updatePositions(row, column, "n");
+            }
+        }
     }
 
+
+    public void setOpponentMark(int row, int column) {
+        String previousMark = this.POSITIONS[row][column];
+        if (Objects.equals(previousMark, "N")){
+            this.updatePositions(row, column, " ");
+        }
+        else if (Objects.equals(previousMark, "X")){
+            this.updatePositions(row, column, "*");
+        }
+        else if (Objects.equals(previousMark, "n")){
+            this.updatePositions(row, column, "-");
+        }
+    }
 }
 
