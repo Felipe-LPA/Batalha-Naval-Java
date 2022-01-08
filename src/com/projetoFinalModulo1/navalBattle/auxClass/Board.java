@@ -8,6 +8,7 @@ import java.util.Scanner;
 public class Board {
     private final String[][] POSITIONS = new String[10][10];
     private int ships = 10;
+    private final String LETTERS = "ABCDEFGHIJ";
 
 //    public void updatePositions(int column, char rowLetter, String mark) {
 //        int row = this.getNumber(rowLetter);
@@ -58,75 +59,30 @@ public class Board {
 //    public boolean verifyWinner() {
 //        return false;
 //    }
-public void setEmptyPositions(){
-    for (String[] position : POSITIONS) {
-        Arrays.fill(position, " ");
+    public void setEmptyPositions(){
+        for (String[] position : POSITIONS) {
+            Arrays.fill(position, " ");
+        }
     }
-}
+
     private String getLetter(int index){
-        switch (index){
-            case 0:
-                return "A";
-            case 1:
-                return "B";
-            case 2:
-                return "C";
-            case 3:
-                return "D";
-            case 4:
-                return "E";
-            case 5:
-                return "F";
-            case 6:
-                return "G";
-            case 7:
-                return "H";
-            case 8:
-                return "I";
-            case 9:
-                return "J";
-            default:
-                return " ";
-        }
+        return Math.abs(index) < 10 ? this.LETTERS.substring(index, index + 1) : " ";
     }
 
-    private int getNumber(String index){
-        switch (index){
-            case "A":
-            case "a":
-                return 0;
-            case "B":
-            case "b":
-                return 1;
-            case "C":
-            case "c":
-                return 2;
-            case "D":
-            case "d":
-                return 3;
-            case "E":
-            case "e":
-                return 4;
-            case "F":
-            case "f":
-                return 5;
-            case "G":
-            case "g":
-                return 6;
-            case "H":
-            case "h":
-                return 7;
-            case "I":
-            case "i":
-                return 8;
-            case "J":
-            case "j":
-                return 9;
-            default:
-                return 99;
-        }
+    public int getNumber(String index){
+        return this.LETTERS.contains(index.toUpperCase()) ? this.LETTERS.indexOf(index.toUpperCase()) : 99;
     }
 
+    public int  thereIsShip(int column, int row) {
+        return Objects.equals(this.POSITIONS[row][column], "N") ? 1:2;
+    }
+
+    public void shot(int column, int row, int match){
+       if (Objects.equals(this.POSITIONS[row][column], " ") && match == 1) this.updatePositions(column, row, "n");
+        else if (Objects.equals(this.POSITIONS[row][column], " ") && match ==2) this.updatePositions(column, row, "-");
+        if (Objects.equals(this.POSITIONS[row][column], "N") && match == 1) this.updatePositions(column, row, "X");
+         else if (Objects.equals(this.POSITIONS[row][column], "N") && match == 2) this.updatePositions(column, row, "*");
+    }
 
 }
 
