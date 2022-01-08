@@ -1,9 +1,6 @@
 package com.projetoFinalModulo1.navalBattle.auxClass;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class Board {
     private final String[][] POSITIONS = new String[10][10];
@@ -70,18 +67,18 @@ public class Board {
     }
 
     public int getNumber(String index){
-        return this.LETTERS.contains(index.toUpperCase()) ? this.LETTERS.indexOf(index.toUpperCase()) : 99;
+        return index.contains(index.toUpperCase()) ? this.LETTERS.indexOf(index.toUpperCase()) : 99;
     }
 
     public int  thereIsShip(int column, int row) {
-        return Objects.equals(this.POSITIONS[row][column], "N") ? 1:2;
+        return this.POSITIONS[row][column] == "N" ? 1:2;
     }
 
     public void shot(int column, int row, int match){
-       if (Objects.equals(this.POSITIONS[row][column], " ") && match == 1) this.updatePositions(column, row, "n");
-        else if (Objects.equals(this.POSITIONS[row][column], " ") && match ==2) this.updatePositions(column, row, "-");
-        if (Objects.equals(this.POSITIONS[row][column], "N") && match == 1) this.updatePositions(column, row, "X");
-         else if (Objects.equals(this.POSITIONS[row][column], "N") && match == 2) this.updatePositions(column, row, "*");
+       if (this.POSITIONS [row][column] == " " && match == 1) this.updatePositions(column, row, "n");
+        else if (this.POSITIONS [row][column] == " " && match ==2) this.updatePositions(column, row, "-");
+        if (this.POSITIONS [row][column] == "N" && match == 1) this.updatePositions(column, row, "X");
+         else if (this.POSITIONS [row][column] == "N" && match == 2) this.updatePositions(column, row, "*");
     }
 
 }

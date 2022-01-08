@@ -4,9 +4,10 @@ import java.util.Random;
 
 public class Bot extends Player{
 
-    public void doTurn(){
-
+    public int doTurn(int column, int row){
+        return this.board.thereIsShip(column, row);
     }
+
     public void setName(){
         Random random = new Random();
         super.name = "bot" + random.nextInt(99);
