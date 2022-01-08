@@ -2,7 +2,9 @@ package com.projetoFinalModulo1.navalBattle;
 
 import com.projetoFinalModulo1.navalBattle.auxClass.Bot;
 import com.projetoFinalModulo1.navalBattle.auxClass.Human;
+import com.projetoFinalModulo1.navalBattle.auxClass.Player;
 
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Scanner;
@@ -64,7 +66,9 @@ public class NavalBattle {
 
         //verify is position is valid! ??
         int match = bot.doTurn(column, row);
-        human.board.shot(column, row, match);
+        char ck = human.board.shot(column, row, match);
+        check(ck, bot, column, row);
+
         human.board.printPosition();
         return human;
     }
@@ -78,7 +82,8 @@ public class NavalBattle {
         String position = sc.nextLine();
         if(!Objects.equals(position, "r") && !Objects.equals(position, "R")){
            String[] splitedPosition = position.split("");
-           row =human.checkNumber(splitedPosition[0]);
+           String aux =splitedPosition[0].toUpperCase();
+           row = human.checkNumber(aux);
            column =  Integer.parseInt(splitedPosition[1]);
         }else{
             row = random.nextInt(10);
@@ -86,7 +91,9 @@ public class NavalBattle {
         }
 
         int match = human.doTurn(column, row);
-        bot.board.shot(column, row, match);
+        char ck = bot.board.shot(column, row, match);
+        check(ck, human, column, row);
+
         return bot;
     }
 
@@ -147,5 +154,14 @@ public class NavalBattle {
     }
     private static void printWhoStarts(String winner) {
         System.out.printf("%s começa o Jogo!%n", winner);
+    }
+
+    //Caso player atire em sua própria posição!
+    private static  void  check(char check, Player pl, int column, int row){
+        if (check == 'n'){
+            pl.board.updatePositions(column, row,"n");
+        }else if(check == 'X'){
+            pl.board.updatePositions(column, row,"X");
+        }
     }
 }
