@@ -5,6 +5,11 @@ import java.util.*;
 public class Board {
     private final String[][] POSITIONS = new String[10][10];
     private final String LETTERS = "ABCDEFGHIJ";
+    private final int SHIPS = 10;
+
+    public int getSHIPS() {
+        return SHIPS;
+    }
 
 
     public void updatePositions(int row, int column, String mark) {
@@ -24,8 +29,8 @@ public class Board {
 
     public void setShips(boolean isAuto) {
         int i = 0;
-        int ships = 10;
-        while (i < ships) {
+
+        while (i < this.SHIPS) {
                 Random random = new Random();
                 int column = random.nextInt(10);
                 int row = random.nextInt(10);

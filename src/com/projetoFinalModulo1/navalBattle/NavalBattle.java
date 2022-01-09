@@ -12,37 +12,60 @@ public class NavalBattle {
     public static void start(){
         boolean plGame = true;
         while (plGame) {
-            playGame();
+            playGame("test");
+//            playGame("");
             plGame = !(askBinaryQuestion("Fim de Jogo!", "Jogar de Novo", "Parar") == 2);
         }
         System.out.println("Obrigado por jogar conosco!!!");
     }
 
-    public static void playGame(){
-
+    public static void playGame(String type){
+        makeSpaces();
         Bot bot = initiateBot();
         setBotBoard(bot);
 
         Human human = initiateHuman();
         setHumanBoard(human);
-
+        makeSpaces();
         int firstPlayer = chooseWhoStarts();
+        waitSec(1);
+        System.out.println("*flip*");
+        waitSec(1);
+        System.out.println("*flip*");
+        waitSec(1);
+        System.out.println("*flip*");
+        waitSec(2);
         printWhoStarts(firstPlayer == 1 ? "Você" : bot.getName());
-
+        waitSec(2);
+        makeSpaces();
         boolean followPlaying = true;
         int iteration = 0;
         String turn;
+        int i = 0;
         while(followPlaying) {
-            if ((iteration % 2 == 0 && firstPlayer != 1) || (iteration % 2 != 0 && firstPlayer == 1)) {
+            if ((iteration % 2 != 0 && firstPlayer != 1) || (iteration % 2 == 0 && firstPlayer == 1)) {
+                if (Objects.equals(type, "test") ) {
+                    System.out.println("Bot Board");
+                    bot.board.printPosition();
+                }
+                System.out.printf("                   RODADA %d                  %n", iteration + 1);
+                System.out.println("*********************************************");
                 turnHuman(bot, human);
-//                turn = human.getName();
+                makeSpaces();
+                turn = human.getName();
             } else {
-                turnBot(bot, human);
-//                turn = bot.getName();
+                int[] positionToHit = {i, 0};
+                turnBot(bot, human, type, positionToHit);
+                turn = bot.getName();
+                i++;
             }
+
+            followPlaying = verifyWinner(bot.getScore(), bot.board.getSHIPS(), human.getScore(), human.board.getSHIPS());
+            if(!followPlaying)ShowWinner(turn);
             iteration++;
-            followPlaying = verifyWinner(bot.getScore(), human.getScore());
         }
+
+
         System.out.println("Hora de ver o resultado desta partida!");
         System.out.printf("Tabuleiro de %s:%n", human.getName());
         human.board.printPosition();
@@ -50,25 +73,54 @@ public class NavalBattle {
         bot.board.printPosition();
     }
 
-    private static boolean verifyWinner(int botScore, int humanScore) {
-        // This method needs to be developed
-        return !(botScore == 10 || humanScore == 10);
+    private static void ShowWinner(String turn) {
+        makeSpaces();
+        int howManyChars = turn.length();
+        int half = Math.floorDiv((68 - howManyChars), 2);
+        System.out.println("######################################################################");
+        System.out.println("######################################################################");
+        System.out.println("######################################################################");
+        System.out.println("############################## VENCEDOR ##############################");
+        for (int i = 0; i < half; i++) {
+            System.out.print("#");
+        }
+        System.out.printf(" %s ", turn);
+        if((30 - howManyChars) % 2 != 0){
+            half++;
+        }
+        for (int i = 0; i < half; i++) {
+            System.out.print("#");
+        }
+        System.out.println();
+        System.out.println("######################################################################");
+        System.out.println("######################################################################");
+        System.out.println("######################################################################");
+        waitSec(4);
+        makeSpaces();
     }
-    private static void turnBot(Bot bot, Human human) {
-//        bot.board.printPosition();
+
+
+    private static void turnBot(Bot bot, Human human, String type, int[] positionToHit) {
         Random random = new Random();
         int column = random.nextInt(10);
         int row = random.nextInt(10);
         boolean validShot = false;
-        while(!validShot){
-            column = random.nextInt(10);
-            row = random.nextInt(10);
-            validShot = bot.board.isShotValid(row, column);
+        if(Objects.equals(type, "")){
+            while(!validShot){
+                column = random.nextInt(10);
+                row = random.nextInt(10);
+                validShot = bot.board.isShotValid(row, column);
+            }
+        }else{
+
+            column = positionToHit[0];
+            row = positionToHit[1];
         }
         boolean hit = human.board.checkHit(row, column);
         if(hit) bot.setScore();
         bot.board.setSelfMark(row, column, hit);
         human.board.setOpponentMark(row, column);
+
     }
     private static void turnHuman(Bot bot, Human human) {
         Scanner sc = new Scanner(System.in);
@@ -78,7 +130,9 @@ public class NavalBattle {
         boolean validShot = false;
         while (!validShot){
             human.board.printPosition();
-            System.out.printf("Score: Você %d : %d %s%n", human.getScore(), bot.getScore(), bot.getName());
+            System.out.println("---------------------------------------------");
+            System.out.printf("           Score: Você %d : %d %s           %n", human.getScore(), bot.getScore(), bot.getName());
+            System.out.println("---------------------------------------------");
             System.out.printf("Sua vez de jogar: %nInforme uma posição para atirar em seu adversário(Ex: A2, b4, c7...)%n Digite r para random%nopç: \"");
             String position = sc.nextLine();
             if(!Objects.equals(position, "r") && !Objects.equals(position, "R")){
@@ -88,16 +142,20 @@ public class NavalBattle {
                 try {
                     column =  Integer.parseInt(splitedPosition[1]);
                     validShot = human.board.isShotValid(row, column);
-                }catch (NumberFormatException exception){
-                    
+                }catch (NumberFormatException ignored){
+
                 }
             }else{
-                row = random.nextInt(10);
-                column = random.nextInt(10);
-                validShot = human.board.isShotValid(row, column);
+                while (!validShot){
+                    row = random.nextInt(10);
+                    column = random.nextInt(10);
+                    validShot = human.board.isShotValid(row, column);
+                }
             }
             if(!validShot){
                 System.out.printf("A posição %s é inválida, jogue novamente!", position);
+                waitSec(2);
+                makeSpaces();
             }
 
         }
@@ -123,6 +181,7 @@ public class NavalBattle {
         System.out.print("Digite seu nome: ");
         String name = sc.nextLine();
         human.setName(name);
+        makeSpaces();
         return human;
     }
     private static void setHumanBoard(Human human) {
@@ -131,20 +190,7 @@ public class NavalBattle {
         human.board.setShips(setShipsAuto);
         human.board.printPosition();
     }
-    private static int askBinaryQuestion(String msg, String opt1, String opt2) {
-        Scanner sc = new Scanner(System.in);
-        boolean invalidOpt = true;
-        int response = 1;
-        System.out.println(msg);
-        while(invalidOpt) {
-            System.out.printf("Você prefere %s ou %s?%n", opt1, opt2);
-            System.out.printf("Digite 1 para %s ou 2 para %s: ", opt1, opt2);
-            response = Integer.parseInt(sc.nextLine());
-            if (response == 1 || response == 2)  invalidOpt = false;
-            else System.out.println("Opção Invalida!");
-        }
-        return response;
-    }
+
     private static int chooseWhoStarts() {
         int humanCoinSide = askBinaryQuestion("Vamos lançar uma moeda para decidir quem começa o Jogo!", "cara", "coroa");
         return whoIsTheFirstPlayer(humanCoinSide);
@@ -162,5 +208,33 @@ public class NavalBattle {
         System.out.printf("%s começa o Jogo!%n", winner);
     }
 
+    private static boolean verifyWinner(int botScore, int qtdShipsBot, int humanScore, int qtdshipsHuman) {
+        return !(botScore == qtdShipsBot || humanScore == qtdshipsHuman);
+    }
+
+    private static void waitSec(int sec) {
+        try {
+            Thread.sleep(sec * 1000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    private static void makeSpaces() {
+        System.out.printf("%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n");
+    }
+    private static int askBinaryQuestion(String msg, String opt1, String opt2) {
+        Scanner sc = new Scanner(System.in);
+        boolean invalidOpt = true;
+        int response = 1;
+        System.out.println(msg);
+        while(invalidOpt) {
+            System.out.printf("Você prefere %s ou %s?%n", opt1, opt2);
+            System.out.printf("Digite 1 para %s ou 2 para %s: ", opt1, opt2);
+            response = Integer.parseInt(sc.nextLine());
+            if (response == 1 || response == 2)  invalidOpt = false;
+            else System.out.println("Opção Invalida!");
+        }
+        return response;
+    }
 
 }
