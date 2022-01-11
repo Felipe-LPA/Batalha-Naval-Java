@@ -5,6 +5,7 @@ import java.util.*;
 public class Board {
     private final String[][] POSITIONS = new String[10][10];
     private final String LETTERS = "ABCDEFGHIJ";
+    private final String NUMBERS = "0123456789";
     private final int SHIPS = 10;
 
     public int getSHIPS() {
@@ -62,11 +63,17 @@ public class Board {
     public String getLetter(int index){
         return Math.abs(index) < 10 ? this.LETTERS.substring(index, index + 1) : " ";
     }
-
     public int getNumber(String index){
         return this.LETTERS.contains(index.toUpperCase())? this.LETTERS.indexOf(index.toUpperCase()) : 99;
     }
-
+    public boolean IsValidBoardLetter(String letter) {
+        if (letter.length() != 1 ) return false;
+        return this.LETTERS.contains(letter.toUpperCase());
+    }
+    public boolean IsValidBoardNumber(String number) {
+        if (number.length() != 1 ) return false;
+        return this.NUMBERS.contains(number);
+    }
     public boolean isShotValid(int row, int column) {
         return Objects.equals(this.POSITIONS[row][column], " ") ||
                 Objects.equals(this.POSITIONS[row][column], "N");
