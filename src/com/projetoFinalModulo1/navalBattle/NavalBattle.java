@@ -45,8 +45,8 @@ public class NavalBattle {
                     System.out.println("Bot Board");
                     bot.board.printPosition();
                 }
-                System.out.printf("                   RODADA %d                  %n", iteration + 1);
-                printCaracterLines('*', 45,1);
+                System.out.printf("%sRODADA %d%s%n", multiplyString(" ", 19), iteration + 1, multiplyString(" ", 19));
+                printStringLines(multiplyString("*", 45), 1);
                 turnHuman(bot, human);
                 makeSpaces();
                 turn = human.getName();
@@ -62,7 +62,6 @@ public class NavalBattle {
             iteration++;
         }
 
-
         System.out.println("Hora de ver o resultado desta partida!");
         System.out.printf("Tabuleiro de %s:%n", human.getName());
         human.board.printPosition();
@@ -74,8 +73,8 @@ public class NavalBattle {
         makeSpaces();
         int howManyChars = turn.length();
         int half = Math.floorDiv((68 - howManyChars), 2);
-        printCaracterLines('#', 70, 3);
-        System.out.println("############################## VENCEDOR ##############################");
+        printStringLines(multiplyString("#", 70), 3);
+        printStringLines(multiplyString("#", 30) + " VENCEDOR " + multiplyString("#", 30), 1);
         for (int i = 0; i < half; i++) {
             System.out.print("#");
         }
@@ -87,16 +86,18 @@ public class NavalBattle {
             System.out.print("#");
         }
         System.out.println();
-        printCaracterLines('#', 70, 3);
+        printStringLines(multiplyString("#", 70), 3);
         waitSec(4);
         makeSpaces();
     }
 
-    private static void printCaracterLines(char caracter, int nTimes, int nLines) {
-        char[] carac = new char[nTimes];
-        for (int i = 0; i < nTimes; i++) carac[i] = caracter;
-        String value = new String(carac);
-        for (int i = 0; i < nLines; i++) System.out.println(value);
+    private static String multiplyString(String string, int nTimes) {
+        String word = "";
+        for (int i = 0; i < nTimes; i++) word += string;
+        return word;
+    }
+    private static void printStringLines(String word, int nLines) {
+        for (int i = 0; i < nLines; i++) System.out.println(word);
     }
     private static void turnBot(Bot bot, Human human, String type, int[] positionToHit) {
         Random random = new Random();
@@ -128,9 +129,9 @@ public class NavalBattle {
         boolean validShot = false;
         while (!validShot){
             human.board.printPosition();
-            System.out.println("---------------------------------------------");
+            printStringLines(multiplyString("-", 44), 1);
             System.out.printf("           Score: Você %d : %d %s           %n", human.getScore(), bot.getScore(), bot.getName());
-            System.out.println("---------------------------------------------");
+            printStringLines(multiplyString("-", 44), 1);
             String position = getInfo("Sua vez de jogar: %nInforme uma posição para atirar em seu adversário(Ex: A2, b4, c7...)%n Digite r para random%nResposta: ");
             if(!Objects.equals(position, "r") && !Objects.equals(position, "R")){
                 String[] splitedPosition = position.split("");
@@ -155,7 +156,6 @@ public class NavalBattle {
                 waitSec(2);
                 makeSpaces();
             }
-
         }
         boolean hit = bot.board.checkHit(row, column);
         if(hit) human.setScore();
@@ -259,7 +259,7 @@ public class NavalBattle {
         }
     }
     private static void makeSpaces() {
-        System.out.printf("%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n");
+        System.out.printf(multiplyString("%n", 42));
     }
     private static int askBinaryQuestion(String msg, String opt1, String opt2) {
         Scanner sc = new Scanner(System.in);
