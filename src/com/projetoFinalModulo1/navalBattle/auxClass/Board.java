@@ -1,17 +1,20 @@
 package com.projetoFinalModulo1.navalBattle.auxClass;
 
+import com.projetoFinalModulo1.navalBattle.NavalBattle;
+
 import java.util.*;
 
 public class Board {
     private final String[][] POSITIONS = new String[10][10];
     private final String LETTERS = "ABCDEFGHIJ";
-    private final String NUMBERS = "0123456789";
-    private final int SHIPS = 10;
+    private int ships = 10;
 
-    public int getSHIPS() {
-        return SHIPS;
+    public int getHowMuchShips() {
+        return ships;
     }
-
+    public void setHowMuchShips(int howMuch) {
+        this.ships = howMuch;
+    }
 
     public void updatePositions(int row, int column, String mark) {
         this.POSITIONS[row][column] = mark;
@@ -31,12 +34,13 @@ public class Board {
     public void setShips(boolean isAuto) {
         int i = 0;
 
-        while (i < this.SHIPS) {
+        while (i < this.ships) {
                 Random random = new Random();
                 int column = random.nextInt(10);
                 int row = random.nextInt(10);
             if(!isAuto){
                 Scanner sc = new Scanner(System.in);
+                NavalBattle.makeSpaces();
                 this.printPosition();
                 System.out.printf("Para posicionar o navio %d escolha uma das opções: %nInforme uma posição ainda não preenchida em formato válido(Ex: A2, b4, c7...) %nDigite r para random %nopç: ", i+1);
                 String position = sc.nextLine();
@@ -46,7 +50,6 @@ public class Board {
                     column =  Integer.parseInt(splitedPosition[1]);
                 }
             }
-//            System.out.printf("row: %d, column: %d  - %s%n", row, column, this.isValidPosition(column, row));
             if (row != 99 && this.isValidPosition(row, column)) {
                 this.updatePositions(row, column, "N");
                 i++;
@@ -72,7 +75,8 @@ public class Board {
     }
     public boolean IsValidBoardNumber(String number) {
         if (number.length() != 1 ) return false;
-        return this.NUMBERS.contains(number);
+        String  numbers = "0123456789";
+        return numbers.contains(number);
     }
     public boolean isShotValid(int row, int column) {
         return Objects.equals(this.POSITIONS[row][column], " ") ||
