@@ -2,7 +2,10 @@ package com.projetoFinalModulo1.navalBattle;
 
 import com.projetoFinalModulo1.navalBattle.auxClass.Bot;
 import com.projetoFinalModulo1.navalBattle.auxClass.Human;
+import com.projetoFinalModulo1.navalBattle.auxClass.Player;
 
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.function.Consumer;
@@ -35,11 +38,11 @@ public class NavalBattle {
         int iteration = 0;
         while(followPlaying) {
             if (iteration % 2 == 0) {
-                if (firstPlayer == 1) turnHuman();
-                else turnBot();
+                if (firstPlayer == 1) turnHuman(bot, human);
+                else turnBot(bot, human);
             } else {
-                if (firstPlayer == 1) turnBot();
-                else turnHuman();
+                if (firstPlayer == 1) turnBot(bot, human);
+                else turnHuman(bot, human);
             }
             iteration++;
             followPlaying = verifyWinner();
@@ -56,13 +59,42 @@ public class NavalBattle {
         // This method needs to be developed
         return launchCoin() == 1;
     }
-    private static int turnBot() {
-        // This method needs to be developed
-        return 1;
+    private static Human turnBot(Bot bot, Human human) {
+        Random random = new Random();
+        int column = random.nextInt(10);
+        int row = random.nextInt(10);
+
+        //verify is position is valid! ??
+        int match = bot.doTurn(column, row);
+        char ck = human.board.shot(column, row, match);
+        check(ck, bot, column, row);
+
+        human.board.printPosition();
+        return human;
     }
-    private static int turnHuman() {
-        // This method needs to be developed
-        return 1;
+    private static Bot turnHuman(Bot bot, Human human) {
+        Scanner sc = new Scanner(System.in);
+        Random random = new Random();
+        int row;
+        int column;
+
+        System.out.printf("Sua vez de jogar: %nInforme uma posição para atirar em seu adversário(Ex: A2, b4, c7...)%n Digite r para random%nopç: \"");
+        String position = sc.nextLine();
+        if(!Objects.equals(position, "r") && !Objects.equals(position, "R")){
+           String[] splitedPosition = position.split("");
+           String aux =splitedPosition[0].toUpperCase();
+           row = human.checkNumber(aux);
+           column =  Integer.parseInt(splitedPosition[1]);
+        }else{
+            row = random.nextInt(10);
+            column = random.nextInt(10);
+        }
+
+        int match = human.doTurn(column, row);
+        char ck = bot.board.shot(column, row, match);
+        check(ck, human, column, row);
+
+        return bot;
     }
 
     private static Bot initiateBot(){
@@ -73,6 +105,7 @@ public class NavalBattle {
     private static Bot setBotBoard(Bot bot) {
         bot.board.setEmptyPositions();
         bot.board.setShips(true);
+
         return bot;
     }
     private static Human initiateHuman(String name){
@@ -121,5 +154,14 @@ public class NavalBattle {
     }
     private static void printWhoStarts(String winner) {
         System.out.printf("%s começa o Jogo!%n", winner);
+    }
+
+    //Caso player atire em sua própria posição!
+    private static  void  check(char check, Player pl, int column, int row){
+        if (check == 'n'){
+            pl.board.updatePositions(column, row,"n");
+        }else if(check == 'X'){
+            pl.board.updatePositions(column, row,"X");
+        }
     }
 }

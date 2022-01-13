@@ -37,11 +37,11 @@ public class Board {
             if(!isAuto){
                 Scanner sc = new Scanner(System.in);
                 this.printPosition();
-                System.out.printf("Para posicionar o navio %d escolha uma das opções: %nInforme uma posição ainda não preenchida em formato válido(Ex: A2, b4, c7...)%n Digite r para random%nopç: ", i+1);
+                System.out.printf("Para posicionar o navio %d escolha uma das opções: %nInforme uma posição ainda não preenchida em formato válido(Ex: A2, b4, c7...) %nDigite r para random %nopç: ", i+1);
                 String position = sc.nextLine();
                 if(!Objects.equals(position, "r") && !Objects.equals(position, "R")){
                     String[] splitedPosition = position.split("");
-                    row = this.getNumber(splitedPosition[0]);
+                    row = this.getNumber(splitedPosition[0].toUpperCase());
                     column =  Integer.parseInt(splitedPosition[1]);
                 }
             }
@@ -56,18 +56,34 @@ public class Board {
 //    public boolean verifyWinner() {
 //        return false;
 //    }
-public void setEmptyPositions(){
-    for (String[] position : POSITIONS) {
-        Arrays.fill(position, " ");
+    public void setEmptyPositions(){
+        for (String[] position : POSITIONS) {
+            Arrays.fill(position, " ");
+        }
     }
-}
 
     private String getLetter(int index){
         return Math.abs(index) < 10 ? this.LETTERS.substring(index, index + 1) : " ";
     }
 
-    private int getNumber(String index){
-        return index.contains(index.toUpperCase()) ? this.LETTERS.indexOf(index.toUpperCase()) : 99;
+    public int getNumber(String index){
+        return index.contains(index.toUpperCase())? this.LETTERS.indexOf(index.toUpperCase()) : 99;
+    }
+
+    public int  thereIsShip(int column, int row) {
+        return this.POSITIONS[row][column] == "N" ? 1 : 2;
+    }
+
+    public char shot(int column, int row, int match){
+       if (this.POSITIONS [row][column] == " " && match == 1) {
+           this.updatePositions(column, row, "-");
+           return 'n';
+       }else if (this.POSITIONS [row][column] == " " && match ==2) this.updatePositions(column, row, "-");
+        if (this.POSITIONS [row][column] == "N" && match == 1) {
+            this.updatePositions(column, row, "*");
+            return  'X';
+        }else if (this.POSITIONS [row][column] == "N" && match == 2) this.updatePositions(column, row, "*");
+        return 'a';
     }
 
 }
